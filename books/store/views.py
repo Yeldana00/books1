@@ -20,6 +20,11 @@ class BookViewSet(ModelViewSet):
     # add ordering
     ordering_fields = ['price', 'autor_name']
 
+    # permissions
+    def perform_create(self, serializer):
+        serializer.validated_data['owner'] = self.request.user
+        serializer.save()
+
 
 # auth
 def auth(request):
