@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 from .models import Book
 from .serializers import BooksSerializer
@@ -13,7 +13,7 @@ class BookViewSet(ModelViewSet):
     # second lesson filtering
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     # OAuth
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly] # read all without authenticate
     filterset_fields = ['price']
     # add search
     search_fields = ['name', 'author_name']
