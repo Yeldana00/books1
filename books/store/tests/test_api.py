@@ -9,6 +9,8 @@ from rest_framework.test import APITestCase
 
 from store.models import Book, UserBookRelation
 from store.serializers import BooksSerializer
+from django.test.utils import CaptureQueriesContext
+from django.db import connection
 
 
 class BooksApiTestCase(APITestCase):
@@ -20,10 +22,13 @@ class BooksApiTestCase(APITestCase):
 
     def test_get(self):
         url = reverse('book-list')
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(url)
+            self.assertEqual(2, len(queries))
         response = self.client.get(url)
         books = Book.objects.all().annotate(
             annotated_likes=Count(Case(When(userbookrelation__like=True, then=1)))
-        )
+        ).order_by('id')
         serializer_data = BooksSerializer(books, many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)

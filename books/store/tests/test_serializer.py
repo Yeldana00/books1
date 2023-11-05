@@ -10,11 +10,11 @@ from store.serializers import BooksSerializer
 class BookSerializerTestCase(TestCase):
     def test_ok(self):
         # create users to annotate like
-        user1 = User.objects.create(username='user1')
-        user2 = User.objects.create(username='user2')
-        user3 = User.objects.create(username='user3')
+        user1 = User.objects.create(username='user1', first_name = 'Yeldana', last_name='Kenges')
+        user2 = User.objects.create(username='user2', first_name = 'Tangat', last_name='Kenges')
+        user3 = User.objects.create(username='user3', first_name = '1', last_name='2')
         book_1 = Book.objects.create(name='Test book 1', price=25,
-                                     author_name='Author 1')
+                                     author_name='Author 1', owner=user1)
         book_2 = Book.objects.create(name='Test book 2', price=55,
                                      author_name='Author 2')
         # create likes for book_1
@@ -39,10 +39,25 @@ class BookSerializerTestCase(TestCase):
                 'price': '25.00',
                 'author_name': 'Author 1',
                 # add likes_count to annotate
-                'likes_count': 3,
+                # 'likes_count': 3,
                 # annotate likes
                 'annotated_likes': 3,
-                'rating': '4.67'
+                'rating': '4.67',
+                'owner_name': 'user1',
+                'readers': [
+                    {
+                        'first_name': 'Yeldana',
+                        'last_name': 'Kenges'
+                    },
+                    {
+                        'first_name': 'Tangat',
+                        'last_name': 'Kenges'
+                    },
+                    {
+                        'first_name': '1',
+                        'last_name': '2'
+                    },
+                ]
             },
             {
                 'id': book_2.id,
@@ -50,10 +65,25 @@ class BookSerializerTestCase(TestCase):
                 'price': '55.00',
                 'author_name': 'Author 2',
                 # add likes_count to annotate
-                'likes_count': 2,
+                # 'likes_count': 2,
                 # annotate likes
                 'annotated_likes': 2,
-                'rating': '3.50'
+                'rating': '3.50',
+                'owner_name': '',
+                'readers': [
+                    {
+                        'first_name': 'Yeldana',
+                        'last_name': 'Kenges'
+                    },
+                    {
+                        'first_name': 'Tangat',
+                        'last_name': 'Kenges'
+                    },
+                    {
+                        'first_name': '1',
+                        'last_name': '2'
+                    },
+                ]
             },
         ]
         self.assertEqual(expected_data, data)
