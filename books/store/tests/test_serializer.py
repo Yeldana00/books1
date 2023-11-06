@@ -10,9 +10,9 @@ from store.serializers import BooksSerializer
 class BookSerializerTestCase(TestCase):
     def test_ok(self):
         # create users to annotate like
-        user1 = User.objects.create(username='user1', first_name = 'Yeldana', last_name='Kenges')
-        user2 = User.objects.create(username='user2', first_name = 'Tangat', last_name='Kenges')
-        user3 = User.objects.create(username='user3', first_name = '1', last_name='2')
+        user1 = User.objects.create(username='user1', first_name='Yeldana', last_name='Kenges')
+        user2 = User.objects.create(username='user2', first_name='Tangat', last_name='Kenges')
+        user3 = User.objects.create(username='user3', first_name='1', last_name='2')
         book_1 = Book.objects.create(name='Test book 1', price=25,
                                      author_name='Author 1', owner=user1)
         book_2 = Book.objects.create(name='Test book 2', price=55,
@@ -20,14 +20,17 @@ class BookSerializerTestCase(TestCase):
         # create likes for book_1
         UserBookRelation.objects.create(user=user1, book=book_1, like=True, rate=5)
         UserBookRelation.objects.create(user=user2, book=book_1, like=True, rate=5)
-        UserBookRelation.objects.create(user=user3, book=book_1, like=True, rate=4)
+        # for testing rate
+        user_book_3 = UserBookRelation.objects.create(user=user3, book=book_1, like=True)
+        user_book_3.rate = 4
+        user_book_3.save()
+
         UserBookRelation.objects.create(user=user1, book=book_2, like=True, rate=3)
         UserBookRelation.objects.create(user=user2, book=book_2, like=True, rate=4)
         UserBookRelation.objects.create(user=user3, book=book_2, like=False,)
         # annotated likes
         books = Book.objects.all().annotate(
-            annotated_likes=Count(Case(When(userbookrelation__like=True, then=1))),
-            rating=Avg('userbookrelation__rate')
+            annotated_likes=Count(Case(When(userbookrelation__like=True, then=1)))
         ).order_by('id')
         data = BooksSerializer(books, many=True).data
         # without annotated likes
@@ -86,5 +89,7 @@ class BookSerializerTestCase(TestCase):
                 ]
             },
         ]
+        print(data)
+        print(expected_data)
         self.assertEqual(expected_data, data)
 
